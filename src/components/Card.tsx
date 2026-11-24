@@ -12,16 +12,25 @@ function Figure({ tour }: { tour: string }) {
   );
 }
 
-export function Card({ c, count, small, delay }: { c: CardDef; count?: number; small?: boolean; delay?: number }) {
+export function CardFace({ c, photoId }: { c: CardDef; photoId?: number }) {
   return (
-    <div className={`tc ${c.rarity}${small ? " sm" : ""}${delay !== undefined ? " flip" : ""}`} style={delay !== undefined ? { animationDelay: `${delay}s` } : undefined}>
-      {count && count > 1 ? <span className="dup" aria-label={`${count} exemplaires`}>×{count}</span> : null}
+    <>
       <div className="in">
         <div className="top"><span>{c.tour}</span><span aria-label={c.country}>{c.flag}</span></div>
-        <div className="pic"><Figure tour={c.tour} /></div>
+        <div className={`pic${photoId ? " photo" : ""}`}>{photoId ? <img src={`/img/${photoId}`} alt="" draggable={false} /> : <Figure tour={c.tour} />}</div>
         <div className="bot"><div className="name">{c.name}</div><div className="meta">{c.country}</div></div>
       </div>
+      <span className="foil" aria-hidden="true" />
       <span className="gem">{RARITY_LABEL[c.rarity]}</span>
+    </>
+  );
+}
+
+export function Card({ c, count, small, photoId }: { c: CardDef; count?: number; small?: boolean; photoId?: number }) {
+  return (
+    <div className={`tc ${c.rarity}${small ? " sm" : ""}`}>
+      {count && count > 1 ? <span className="dup" aria-label={`${count} exemplaires`}>×{count}</span> : null}
+      <CardFace c={c} photoId={photoId} />
     </div>
   );
 }

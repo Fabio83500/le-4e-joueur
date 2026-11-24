@@ -56,3 +56,24 @@ export async function deletePartner(fd: FormData) {
   await q("DELETE FROM partners WHERE id = $1", [Number(fd.get("id"))]);
   revalidatePath("/admin");
 }
+
+export async function setCardPhoto(fd: FormData) {
+  const admin = await requireAdmin();
+  const cardId = String(fd.get("card"));
+  const { getCard } = await import("@/lib/cards");
+  const { saveImage, ImageError } = await import("@/lib/images");
+  const file = fd.get("photo");
+  if (!getCard(cardId) || !(file instanceof File) || file.size === 0) redirect(`/admin/cartes?e=${enc("Choisis une photo.")}`);
+  let id: number;
+  try { id = await saveImage(file, admin.id); }
+  catch (err) { if (err instanceof ImageError) redirect(`/admin/cartes?e=${enc(err.message)}`); throw err; }
+  await q(`INSERT INTO card_photos (card_id, image_id) VALUES ($1,$2)
+           ON CONFLICT (card_id) DO UPDATE SET image_id = EXCLUDED.image_id`, [cardId, id]);
+  revalidatePath("/admin/cartes");
+}
+
+export async function removeCardPhoto(fd: FormData) {
+  await requireAdmin();
+  await q("DELETE FROM card_photos WHERE card_id = $1", [String(fd.get("card"))]);
+  revalidatePath("/admin/cartes");
+}

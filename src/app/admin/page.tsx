@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { q } from "@/db";
 import { requireAdmin } from "@/lib/auth";
 import { formatShort, formatRank } from "@/lib/format";
@@ -60,6 +61,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
           </div>
         ))}
       </section>
+
+      <Link className="btn ghost" href="/admin/cartes">Photos des cartes à collectionner</Link>
+      <Link className="btn ghost" href="/admin/demo-pack">Tester l'ouverture d'un pack</Link>
 
       <section className="stack">
         <h2>Partenaires</h2>

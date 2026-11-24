@@ -115,4 +115,8 @@ CREATE TABLE IF NOT EXISTS pack_openings (
   cards TEXT NOT NULL,
   PRIMARY KEY (user_id, day)
 );
+CREATE TABLE IF NOT EXISTS card_photos (
+  card_id TEXT PRIMARY KEY,
+  image_id INTEGER NOT NULL REFERENCES images(id) ON DELETE CASCADE
+);
 `;
