@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { PhotoInput } from "@/components/PhotoInput";
 
 export function VerifForm() {
   const [method, setMethod] = useState("licence");
@@ -26,7 +27,7 @@ export function VerifForm() {
       {method === "capture" && (
         <div className="field">
           <label htmlFor="capture">Capture d'écran de ton profil TenUp</label>
-          <input id="capture" name="capture" type="file" accept="image/*" required />
+          <PhotoInput id="capture" name="capture" required />
           <span className="hint">Ton nom et ton classement padel doivent être lisibles.</span>
         </div>
       )}

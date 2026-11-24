@@ -5,6 +5,7 @@ import { cardPhotos } from "@/lib/cardPhotos";
 import { removeCardPhoto, setCardPhoto } from "../actions";
 import { Card } from "@/components/Card";
 import { Submit } from "@/components/Submit";
+import { PhotoInput } from "@/components/PhotoInput";
 
 export const metadata = { title: "Photos des cartes · Le 4e Joueur" };
 
@@ -29,7 +30,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
                 <div><b>{c.name}</b><div className="sub">{RARITY_LABEL[c.rarity]} · {c.country}</div></div>
                 <form action={setCardPhoto} className="stack" style={{ gap: 8 }}>
                   <input type="hidden" name="card" value={c.id} />
-                  <input type="file" name="photo" accept="image/*" required aria-label={`Photo de ${c.name}`} />
+                  <PhotoInput name="photo" required aria-label={`Photo de ${c.name}`} />
                   <Submit className="btn small">{photos[c.id] ? "Remplacer la photo" : "Ajouter la photo"}</Submit>
                 </form>
                 {photos[c.id] && (

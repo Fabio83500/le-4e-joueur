@@ -17,7 +17,8 @@ async function createDriver(): Promise<Driver> {
   const url = process.env.DATABASE_URL;
   if (url) {
     const postgres = (await import("postgres")).default;
-    const sql = postgres(url, { max: 5, prepare: false });
+    const local = /localhost|127\.0\.0\.1/.test(url);
+    const sql = postgres(url, { max: 5, prepare: false, ssl: local ? false : "require" });
     return {
       query: async (text, params = []) => (await sql.unsafe(text, params as any[])) as unknown as Row[],
       exec: async (text) => { await sql.unsafe(text); },

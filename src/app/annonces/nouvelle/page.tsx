@@ -2,6 +2,7 @@ import { requireVerified } from "@/lib/auth";
 import { CATEGORIES, CONDITIONS, SECTORS } from "@/lib/var";
 import { createListing } from "../actions";
 import { Submit } from "@/components/Submit";
+import { PhotoInput } from "@/components/PhotoInput";
 
 export const metadata = { title: "Vendre un article · Le 4e Joueur" };
 
@@ -15,8 +16,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
       <form action={createListing} className="stack card">
         <div className="field">
           <label htmlFor="photos">Photos</label>
-          <input id="photos" name="photos" type="file" accept="image/*" multiple />
-          <span className="hint">Jusqu'à 5 photos, 5 Mo maximum chacune</span>
+          <PhotoInput id="photos" name="photos" multiple />
+          <span className="hint">Jusqu'à 5 photos</span>
         </div>
         <div className="field"><label htmlFor="title">Titre</label><input id="title" name="title" maxLength={80} placeholder="Ex. Raquette Babolat Viper" required /></div>
         <div className="grid2">
