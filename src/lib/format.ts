@@ -34,3 +34,8 @@ export function parisDate(date: string, time: string): Date | null {
   const norm = ((offsetMin + 720) % 1440 + 1440) % 1440 - 720;
   return new Date(guess.getTime() - norm * 60000);
 }
+
+// Date du jour à Paris, format AAAA-MM-JJ.
+export function parisToday() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+}

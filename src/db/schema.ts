@@ -101,4 +101,18 @@ CREATE TABLE IF NOT EXISTS partners (
   active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+CREATE TABLE IF NOT EXISTS user_cards (
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  card_id TEXT NOT NULL,
+  count INTEGER NOT NULL DEFAULT 1,
+  first_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, card_id)
+);
+CREATE TABLE IF NOT EXISTS pack_openings (
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  day DATE NOT NULL,
+  streak INTEGER NOT NULL,
+  cards TEXT NOT NULL,
+  PRIMARY KEY (user_id, day)
+);
 `;
