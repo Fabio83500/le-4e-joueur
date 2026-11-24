@@ -1,0 +1,104 @@
+// Schéma de la base. Exécuté au démarrage (CREATE TABLE IF NOT EXISTS).
+export const SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  name TEXT NOT NULL,
+  city TEXT NOT NULL,
+  sector TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'player',
+  verif_status TEXT NOT NULL DEFAULT 'none',
+  verif_method TEXT,
+  licence TEXT,
+  capture_image_id INTEGER,
+  ranking INTEGER,
+  unranked BOOLEAN NOT NULL DEFAULT FALSE,
+  group_id TEXT,
+  reject_reason TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS sessions (
+  token TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  expires_at TIMESTAMPTZ NOT NULL
+);
+CREATE TABLE IF NOT EXISTS images (
+  id SERIAL PRIMARY KEY,
+  owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  mime TEXT NOT NULL,
+  data BYTEA NOT NULL,
+  private BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS clubs (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  city TEXT NOT NULL,
+  sector TEXT NOT NULL,
+  courts TEXT
+);
+CREATE TABLE IF NOT EXISTS group_messages (
+  id SERIAL PRIMARY KEY,
+  group_id TEXT NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  body TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS matches (
+  id SERIAL PRIMARY KEY,
+  group_id TEXT NOT NULL,
+  club_id INTEGER REFERENCES clubs(id),
+  starts_at TIMESTAMPTZ NOT NULL,
+  note TEXT,
+  seats INTEGER NOT NULL DEFAULT 4,
+  created_by INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS match_players (
+  match_id INTEGER NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  PRIMARY KEY (match_id, user_id)
+);
+CREATE TABLE IF NOT EXISTS listings (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  category TEXT NOT NULL,
+  price INTEGER NOT NULL,
+  condition TEXT NOT NULL,
+  city TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS listing_images (
+  listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+  image_id INTEGER NOT NULL REFERENCES images(id) ON DELETE CASCADE,
+  pos INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (listing_id, image_id)
+);
+CREATE TABLE IF NOT EXISTS conversations (
+  id SERIAL PRIMARY KEY,
+  listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+  buyer_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (listing_id, buyer_id)
+);
+CREATE TABLE IF NOT EXISTS conversation_messages (
+  id SERIAL PRIMARY KEY,
+  conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+  sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  body TEXT NOT NULL,
+  read_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS partners (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  tagline TEXT NOT NULL,
+  url TEXT,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+`;
