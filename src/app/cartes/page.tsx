@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { q, one } from "@/db";
 import { requireUser } from "@/lib/auth";
-import { CARDS, getCard, PAGES, RANKING_DATE, STREAK_BONUS_DAYS } from "@/lib/cards";
+import { CARDS, getCard, PAGES, STREAK_BONUS_DAYS } from "@/lib/cards";
 import { cardPhotos } from "@/lib/cardPhotos";
 import { parisToday } from "@/lib/format";
 import { CardFace } from "@/components/Card";
@@ -70,7 +70,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ p
           })}
         </nav>
         <Album page={current} have={have} photos={photos} />
-        <p className="sub">Touche une carte pour l'agrandir. Le badge rouge indique un double. Raretés selon le classement FIP du {RANKING_DATE} : top 4 légendaire, 5 à 10 épique, 11 à 20 rare.</p>
+        <p className="sub">Touche une carte pour l'agrandir. Le badge rouge indique un double. Les joueurs et leur classement sont imaginaires. Rareté selon le classement : top 4 légendaire, 5 à 10 épique, 11 à 20 rare.</p>
       </section>
     </>
   );

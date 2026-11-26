@@ -18,7 +18,7 @@ export function CardFace({ c, photoId }: { c: CardDef; photoId?: number }) {
       <div className="in">
         <div className="top"><span>{c.tour}</span><span aria-label={c.country}>{c.flag}</span></div>
         <div className={`pic${photoId ? " photo" : ""}`}>{photoId ? <img src={`/img/${photoId}`} alt="" draggable={false} /> : <Figure tour={c.tour} />}</div>
-        <div className="bot"><div className="name">{c.name}</div><div className="meta">{c.rank ? `N°${c.rank} mondial · ` : ""}{c.country}</div></div>
+        <div className="bot"><div className="name">{c.name}</div><div className="meta">{c.rank ? `N°${c.rank} du circuit · ` : ""}{c.country}</div></div>
       </div>
       <span className="foil" aria-hidden="true" />
       <span className="gem">{RARITY_LABEL[c.rarity]}</span>
