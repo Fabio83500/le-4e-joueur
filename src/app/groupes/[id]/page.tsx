@@ -7,6 +7,7 @@ import { formatShort } from "@/lib/format";
 import { postMessage, proposeMatch } from "../actions";
 import { MatchCard } from "@/components/Match";
 import { Submit } from "@/components/Submit";
+import { Avatar } from "@/components/Avatar";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ e?: string; ok?: string }> }) {
   const u = await requireVerified();
@@ -17,8 +18,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   const member = u.group_id === g.id;
   const [matches, messages, clubs, members] = await Promise.all([
     upcomingMatches(g.id),
-    q<{ id: number; body: string; created_at: string; user_id: number; name: string }>(
-      `SELECT * FROM (SELECT m.id, m.body, m.created_at, m.user_id, u.name FROM group_messages m JOIN users u ON u.id = m.user_id
+    q<{ id: number; body: string; created_at: string; user_id: number; name: string; avatar: number | null }>(
+      `SELECT * FROM (SELECT m.id, m.body, m.created_at, m.user_id, u.name, u.avatar_image_id AS avatar FROM group_messages m JOIN users u ON u.id = m.user_id
        WHERE m.group_id = $1 ORDER BY m.created_at DESC LIMIT 50) t ORDER BY created_at`, [g.id]),
     q<{ id: number; name: string; city: string; sector: string }>("SELECT id, name, city, sector FROM clubs ORDER BY name"),
     q<{ n: number }>("SELECT count(*)::int AS n FROM users WHERE group_id = $1", [g.id]),
@@ -77,10 +78,13 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         {messages.length === 0 && <div className="empty">Pas encore de message. Lance la conversation !</div>}
         <div className="msgs">
           {messages.map((m) => (
-            <div key={m.id} className={`msg${m.user_id === u.id ? " me" : ""}`}>
-              <b>{m.user_id === u.id ? "Moi" : m.name}</b>
-              <span className="body">{m.body}</span>
-              <time>{formatShort(m.created_at)}</time>
+            <div key={m.id} className={`msg-row${m.user_id === u.id ? " me" : ""}`}>
+              <Avatar name={m.name} image={m.avatar} />
+              <div className={`msg${m.user_id === u.id ? " me" : ""}`}>
+                <b>{m.user_id === u.id ? "Moi" : m.name}</b>
+                <span className="body">{m.body}</span>
+                <time>{formatShort(m.created_at)}</time>
+              </div>
             </div>
           ))}
         </div>

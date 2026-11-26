@@ -1,5 +1,6 @@
 import type { MatchRow } from "@/lib/queries";
-import { formatDateTime, initials } from "@/lib/format";
+import { formatDateTime } from "@/lib/format";
+import { Avatar } from "./Avatar";
 import { joinMatch, leaveMatch } from "@/app/groupes/actions";
 import { Submit } from "./Submit";
 
@@ -20,7 +21,7 @@ export function MatchCard({ m, userId, canJoin }: { m: MatchRow; userId: number;
       {m.note && <p>{m.note}</p>}
       <div className="row">
         <div className="avatars" title={m.players.map((p) => p.name).join(", ")}>
-          {m.players.map((p) => <span key={p.id} className="av">{initials(p.name)}</span>)}
+          {m.players.map((p) => <Avatar key={p.id} name={p.name} image={p.avatar} />)}
           {Array.from({ length: free }, (_, i) => <span key={i} className="av empty" />)}
         </div>
         {canJoin && (inMatch ? (

@@ -32,13 +32,13 @@ export async function listingCards(where = "TRUE", params: unknown[] = [], limit
 
 export type MatchRow = {
   id: number; group_id: string; starts_at: string; note: string | null; seats: number; created_by: number;
-  club_name: string | null; club_city: string | null; players: { id: number; name: string }[];
+  club_name: string | null; club_city: string | null; players: { id: number; name: string; avatar: number | null }[];
 };
 
 export async function upcomingMatches(groupId: string): Promise<MatchRow[]> {
   return q<MatchRow>(
     `SELECT m.id, m.group_id, m.starts_at, m.note, m.seats, m.created_by, c.name AS club_name, c.city AS club_city,
-       COALESCE((SELECT json_agg(json_build_object('id', u.id, 'name', u.name) ORDER BY u.id)
+       COALESCE((SELECT json_agg(json_build_object('id', u.id, 'name', u.name, 'avatar', u.avatar_image_id) ORDER BY u.id)
                  FROM match_players mp JOIN users u ON u.id = mp.user_id WHERE mp.match_id = m.id), '[]'::json) AS players
      FROM matches m LEFT JOIN clubs c ON c.id = m.club_id
      WHERE m.group_id = $1 AND m.starts_at > now() - interval '2 hours'
