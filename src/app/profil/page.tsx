@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { getGroup } from "@/lib/var";
-import { formatRank, initials } from "@/lib/format";
+import { formatRank } from "@/lib/format";
+import { Avatar } from "@/components/Avatar";
 import { unreadCount } from "@/lib/queries";
 import { signOut } from "../auth-actions";
 import { Submit } from "@/components/Submit";
@@ -13,22 +14,28 @@ const STATUS: Record<string, [string, string]> = {
   verified: ["Niveau vérifié", "ok"], rejected: ["Vérification refusée", "bad"],
 };
 
-export default async function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ ok?: string }> }) {
   const u = await requireUser();
+  const { ok } = await searchParams;
   const g = u.group_id ? getGroup(u.group_id) : null;
   const unread = await unreadCount(u.id);
   const [label, tone] = STATUS[u.verif_status]!;
   return (
     <>
       <div className="row" style={{ justifyContent: "flex-start" }}>
-        <span className="av big">{initials(u.name)}</span>
+        <Link href="/profil/avatar" className="av-link" aria-label={u.avatar_image_id ? "Modifier mon avatar" : "Créer mon avatar"}>
+          <Avatar name={u.name} image={u.avatar_image_id} size="huge" />
+          <span className="edit">{u.avatar_image_id ? "Modifier" : "+"}</span>
+        </Link>
         <div><h1>{u.name}</h1><div className="sub">{u.city}</div></div>
       </div>
+      {ok && <div className="notice ok">{ok}</div>}
       <dl className="kv card">
         <dt>Niveau</dt><dd>{u.verif_status === "verified" ? formatRank(u.ranking, u.unranked) : "-"} <span className={`pill ${tone}`}>{label}</span></dd>
         <dt>Groupe</dt><dd>{g ? <Link href={`/groupes/${g.id}`}>{g.name}, {g.zone}</Link> : "Pas encore de groupe"}</dd>
         <dt>E-mail</dt><dd style={{ overflowWrap: "anywhere" }}>{u.email}</dd>
       </dl>
+      <Link className="btn ghost" href="/profil/avatar">{u.avatar_image_id ? "Modifier ou supprimer mon avatar" : "Créer mon avatar"}</Link>
       <Link className="btn ghost" href="/messages">Mes messages{unread > 0 ? ` (${unread} nouveau${unread > 1 ? "x" : ""})` : ""}</Link>
       <Link className="btn ghost" href="/annonces/mes-annonces">Mes annonces</Link>
       <Link className="btn ghost" href={u.verif_status === "verified" ? "/verification?maj=1" : "/verification"}>

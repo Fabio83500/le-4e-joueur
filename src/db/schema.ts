@@ -119,4 +119,8 @@ CREATE TABLE IF NOT EXISTS card_photos (
   card_id TEXT PRIMARY KEY,
   image_id INTEGER NOT NULL REFERENCES images(id) ON DELETE CASCADE
 );
+-- Avatars des joueurs (créés par le joueur lui-même, avec son accord)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_image_id INTEGER;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_consent_at TIMESTAMPTZ;
+ALTER TABLE images ADD COLUMN IF NOT EXISTS kind TEXT;
 `;

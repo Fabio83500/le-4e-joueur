@@ -22,6 +22,7 @@ export type User = {
   unranked: boolean;
   group_id: string | null;
   reject_reason: string | null;
+  avatar_image_id: number | null;
 };
 
 export const hashPassword = (p: string) => bcrypt.hash(p, 10);

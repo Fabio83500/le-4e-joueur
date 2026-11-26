@@ -5,12 +5,14 @@ import { requireUser } from "@/lib/auth";
 import { formatPrice, formatShort } from "@/lib/format";
 import { reply } from "@/app/annonces/actions";
 import { Submit } from "@/components/Submit";
+import { Avatar } from "@/components/Avatar";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const u = await requireUser();
   const { id } = await params;
-  const c = await one<{ id: number; listing_id: number; title: string; price: number; other: string }>(
-    `SELECT c.id, c.listing_id, l.title, l.price, CASE WHEN l.user_id = $2 THEN b.name ELSE s.name END AS other
+  const c = await one<{ id: number; listing_id: number; title: string; price: number; other: string; other_avatar: number | null }>(
+    `SELECT c.id, c.listing_id, l.title, l.price, CASE WHEN l.user_id = $2 THEN b.name ELSE s.name END AS other,
+            CASE WHEN l.user_id = $2 THEN b.avatar_image_id ELSE s.avatar_image_id END AS other_avatar
      FROM conversations c JOIN listings l ON l.id = c.listing_id JOIN users b ON b.id = c.buyer_id JOIN users s ON s.id = l.user_id
      WHERE c.id = $1 AND (c.buyer_id = $2 OR l.user_id = $2)`, [Number(id) || 0, u.id]);
   if (!c) notFound();
@@ -19,9 +21,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     "SELECT id, sender_id, body, created_at FROM conversation_messages WHERE conversation_id = $1 ORDER BY created_at", [c.id]);
   return (
     <>
-      <div className="stack" style={{ gap: 4 }}>
-        <h1>{c.other}</h1>
-        <Link href={`/annonces/${c.listing_id}`} className="sub">{c.title} · {formatPrice(c.price)}</Link>
+      <div className="who">
+        <Avatar name={c.other} image={c.other_avatar} size="big" />
+        <div className="stack" style={{ gap: 4 }}>
+          <h1>{c.other}</h1>
+          <Link href={`/annonces/${c.listing_id}`} className="sub">{c.title} · {formatPrice(c.price)}</Link>
+        </div>
       </div>
       <div className="msgs">
         {msgs.map((m) => (
